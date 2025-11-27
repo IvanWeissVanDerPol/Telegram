@@ -1,121 +1,112 @@
-# 📋 Project Plan - {{BOT_NAME}}
-
-## Documentation Index
-
-| # | File | Description | Read When |
-|---|------|-------------|-----------|
-| 00 | [OVERVIEW.md](00-OVERVIEW.md) | What we're building | **First** |
-| 01 | [STRUCTURE.md](01-STRUCTURE.md) | Files and folders | Understanding code organization |
-| 02 | [DATABASE.md](02-DATABASE.md) | Data storage | Working on database |
-| 03 | [COMMANDS.md](03-COMMANDS.md) | All bot commands | Working on any command |
-| 04 | [MESSAGES.md](04-MESSAGES.md) | Bot responses | Customizing messages |
-| 05 | [LOGIC-FLOWS.md](05-LOGIC-FLOWS.md) | How each feature works | Understanding logic |
-| 06 | [VALIDATIONS.md](06-VALIDATIONS.md) | Input checking | Adding validation |
-| 07 | [SETUP.md](07-SETUP.md) | Initial setup | **Before coding** |
-| 08 | [DEPLOYMENT.md](08-DEPLOYMENT.md) | Going live | After code works |
-| 09 | [NAMING-OPTIONS.md](09-NAMING-OPTIONS.md) | Choose names | **Decide before coding** |
-
----
+# The Phantom Bot - Plan Documentation
 
 ## Quick Start
 
-### 1. First, decide on names
-Open [09-NAMING-OPTIONS.md](09-NAMING-OPTIONS.md) and fill in your choices:
-- Bot name
-- Currency name
-- Command names
-- Message style
+1. Read [01-foundation/overview.md](01-foundation/overview.md)
+2. Review [01-foundation/naming.md](01-foundation/naming.md)
+3. Follow [07-setup/](07-setup/) guides
+4. Deploy with [08-deployment/](08-deployment/)
 
-### 2. Understand the project
-Read these in order:
-1. [00-OVERVIEW.md](00-OVERVIEW.md)
-2. [01-STRUCTURE.md](01-STRUCTURE.md)
-3. [03-COMMANDS.md](03-COMMANDS.md)
+---
 
-### 3. Setup before coding
-Follow [07-SETUP.md](07-SETUP.md) to:
-- Create bot on Telegram
-- Get admin IDs
-- Set up Python environment
+## Documentation Structure
 
-### 4. Code the bot
-We'll work on each file based on:
-- [02-DATABASE.md](02-DATABASE.md) - Database layer
-- [05-LOGIC-FLOWS.md](05-LOGIC-FLOWS.md) - Command logic
-- [06-VALIDATIONS.md](06-VALIDATIONS.md) - Input handling
-- [04-MESSAGES.md](04-MESSAGES.md) - Bot responses
+```
+plan/
+├── 01-foundation/          # Project basics
+│   ├── overview.md         # What we're building
+│   └── naming.md           # Bot & currency names
+│
+├── 02-architecture/        # Code structure
+│   ├── project-structure.md
+│   └── import-flow.md
+│
+├── 03-database/            # Database design
+│   ├── schema-overview.md
+│   ├── core-tables.md      # users, transactions
+│   ├── profile-tables.md   # profiles, kinks
+│   ├── relationship-tables.md
+│   ├── bdsm-tables.md
+│   └── system-tables.md
+│
+├── 04-commands/            # All bot commands
+│   ├── overview.md
+│   ├── core/               # /ver, /dar, /ranking
+│   ├── admin/              # /dar_admin, /quitar
+│   └── bdsm/               # /collar, /azotar, etc
+│
+├── 05-logic/               # Flow diagrams
+│   ├── overview.md
+│   ├── core-flows.md
+│   ├── admin-flows.md
+│   └── atomic-operations.md
+│
+├── 06-validation/          # Input validation
+│   ├── input-validation.md
+│   ├── rate-limiting.md
+│   └── error-messages.md
+│
+├── 07-setup/               # Development setup
+│   ├── telegram-bot.md     # Create bot
+│   └── development-env.md  # Python setup
+│
+├── 08-deployment/          # Go live
+│   ├── railway.md          # Deploy to Railway
+│   └── add-to-group.md     # Add bot to group
+│
+├── 09-features/            # Feature details
+│   ├── profiles/           # User profiles
+│   ├── excel-import/       # Excel import
+│   └── google-sheets/      # Sheets sync
+│
+└── 10-reference/           # Reference docs
+    ├── analysis.md         # Decisions & priorities
+    └── messages.md         # Message templates
+```
 
-### 5. Deploy
-Follow [08-DEPLOYMENT.md](08-DEPLOYMENT.md)
+---
+
+## Implementation Order
+
+### Phase 1: Core
+- [ ] Database setup
+- [ ] /start, /ver
+- [ ] /dar (transfer)
+- [ ] /dar_admin, /quitar
+- [ ] /ranking, /historial
+
+### Phase 2: Import
+- [ ] Excel import
+- [ ] Google Sheets sync
+
+### Phase 3: BDSM
+- [ ] Collars
+- [ ] Punishments
+- [ ] Dungeon
+
+### Phase 4: Advanced
+- [ ] Auctions
+- [ ] Contracts
+- [ ] Full profiles
+
+---
+
+## Key Decisions
+
+| Item | Decision |
+|------|----------|
+| Bot Name | The Phantom |
+| Currency | SadoCoins |
+| Commands | Simple Spanish |
+| Database | SQLite → PostgreSQL |
+| Hosting | Railway.app |
 
 ---
 
 ## Status
 
-| Component | Status | Notes |
-|-----------|--------|-------|
-| Planning | ✅ Complete | All docs written |
-| Naming decisions | ⏳ Pending | Fill out 09-NAMING-OPTIONS.md |
-| Telegram bot created | ⏳ Pending | Follow 07-SETUP.md |
-| Code written | ⏳ Pending | |
-| Testing | ⏳ Pending | |
-| Deployment | ⏳ Pending | |
-
----
-
-## Pending Decisions
-
-These need to be decided before coding:
-
-1. **Currency name** - See [09-NAMING-OPTIONS.md](09-NAMING-OPTIONS.md)
-2. **Bot name** - See [09-NAMING-OPTIONS.md](09-NAMING-OPTIONS.md)
-3. **Command names** - Themed or simple?
-4. **Castigar behavior** - Reject if not enough, or set to 0?
-5. **Message style** - Formal, playful, or roleplay?
-
----
-
-## Files to Create (Code)
-
-When we start coding, we'll create:
-
-```
-dominion-bank-bot/
-├── bot.py
-├── requirements.txt
-├── Procfile
-├── runtime.txt
-├── .env
-├── .gitignore
-├── config/
-│   ├── __init__.py
-│   ├── settings.py
-│   └── messages.py
-├── database/
-│   ├── __init__.py
-│   ├── connection.py
-│   ├── models.py
-│   └── operations.py
-├── handlers/
-│   ├── __init__.py
-│   ├── start.py
-│   ├── balance.py
-│   ├── transfer.py
-│   ├── admin_add.py
-│   ├── admin_remove.py
-│   ├── ranking.py
-│   └── history.py
-└── utils/
-    ├── __init__.py
-    ├── validators.py
-    ├── decorators.py
-    └── helpers.py
-```
-
----
-
-## Next Action
-
-👉 **Open [09-NAMING-OPTIONS.md](09-NAMING-OPTIONS.md) and make your choices!**
-
-Then let me know when you're ready to start coding.
+| Component | Status |
+|-----------|--------|
+| Planning | Complete |
+| Documentation | Organized |
+| Implementation | Ready to start |
