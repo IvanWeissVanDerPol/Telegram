@@ -123,3 +123,27 @@ def parse_amount(text: str) -> Optional[int]:
         return int(cleaned)
     except ValueError:
         return extract_amount(text)
+
+
+async def is_admin(user_id: int) -> bool:
+    """Check if user is admin (either super_admin or database admin).
+
+    Args:
+        user_id: Telegram user ID to check
+
+    Returns:
+        True if user is a super admin or has is_admin flag in database
+    """
+    from src.config import settings
+    from src.database.connection import get_session
+    from src.database.repositories import UserRepository
+
+    # Check super_admin_ids first (fast check)
+    if user_id in settings.super_admin_ids:
+        return True
+
+    # Check database admin flag
+    async with get_session() as session:
+        user_repo = UserRepository(session)
+        user = await user_repo.get_by_telegram_id(user_id)
+        return user is not None and user.is_admin

@@ -52,6 +52,12 @@ from src.handlers.excel_import import (
     handle_excel_document,
     importar_command,
 )
+from src.handlers.profile_import import (
+    exportar_perfiles_command,
+    handle_profile_excel_document,
+    importar_perfiles_command,
+    plantilla_perfiles_command,
+)
 from src.handlers.testing import (
     cleandb_command,
     run_tests_command,
@@ -107,6 +113,30 @@ from src.handlers.bdsm import (
     mi_altar_command,
     tributo_command,
 )
+# AI-powered game commands
+from src.handlers.games import (
+    dado_perverso_command,
+    fantasia_command,
+    prediccion_command,
+    ruleta_command,
+    verdad_reto_command,
+)
+# AI-powered task commands
+from src.handlers.ai_tasks import (
+    castigo_creativo_command,
+    protocolo_command,
+    recompensa_command,
+    reto_command,
+    tarea_command,
+)
+# AI-powered roleplay commands
+from src.handlers.roleplay import (
+    compatibilidad_command,
+    descripcion_ai_command,
+    escena_command,
+    ritual_command,
+    titulo_command,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -152,6 +182,19 @@ def setup_handlers(application: Application) -> None:
     # Excel import/export commands (admin only)
     application.add_handler(CommandHandler("importar", importar_command))
     application.add_handler(CommandHandler("exportar", exportar_command))
+
+    # Profile import/export commands (admin only)
+    application.add_handler(CommandHandler("plantilla_perfiles", plantilla_perfiles_command))
+    application.add_handler(CommandHandler("plantillaperfiles", plantilla_perfiles_command))  # Alias
+    application.add_handler(CommandHandler("exportar_perfiles", exportar_perfiles_command))
+    application.add_handler(CommandHandler("exportarperfiles", exportar_perfiles_command))  # Alias
+    application.add_handler(CommandHandler("importar_perfiles", importar_perfiles_command))
+    application.add_handler(CommandHandler("importarperfiles", importar_perfiles_command))  # Alias
+
+    # Excel document handlers (profile import first, then general)
+    application.add_handler(
+        MessageHandler(filters.Document.ALL, handle_profile_excel_document)
+    )
     application.add_handler(
         MessageHandler(filters.Document.ALL, handle_excel_document)
     )
@@ -220,6 +263,37 @@ def setup_handlers(application: Application) -> None:
         application.add_handler(CommandHandler("devotos", devotos_command))
 
         logger.info("BDSM commands registered")
+
+    # AI-powered game commands (always available)
+    application.add_handler(CommandHandler("ruleta", ruleta_command))
+    application.add_handler(CommandHandler("dado_perverso", dado_perverso_command))
+    application.add_handler(CommandHandler("dadoperverso", dado_perverso_command))  # Alias
+    application.add_handler(CommandHandler("dado", dado_perverso_command))  # Short alias
+    application.add_handler(CommandHandler("verdad_reto", verdad_reto_command))
+    application.add_handler(CommandHandler("verdadreto", verdad_reto_command))  # Alias
+    application.add_handler(CommandHandler("vor", verdad_reto_command))  # Short alias
+    application.add_handler(CommandHandler("prediccion", prediccion_command))
+    application.add_handler(CommandHandler("oraculo", prediccion_command))  # Alias
+    application.add_handler(CommandHandler("fantasia", fantasia_command))
+
+    # AI-powered task commands
+    application.add_handler(CommandHandler("tarea", tarea_command))
+    application.add_handler(CommandHandler("reto", reto_command))
+    application.add_handler(CommandHandler("castigo_creativo", castigo_creativo_command))
+    application.add_handler(CommandHandler("castigocreativo", castigo_creativo_command))  # Alias
+    application.add_handler(CommandHandler("recompensa", recompensa_command))
+    application.add_handler(CommandHandler("protocolo", protocolo_command))
+
+    # AI-powered roleplay commands
+    application.add_handler(CommandHandler("escena", escena_command))
+    application.add_handler(CommandHandler("ambiente", escena_command))  # Alias
+    application.add_handler(CommandHandler("ritual", ritual_command))
+    application.add_handler(CommandHandler("titulo", titulo_command))
+    application.add_handler(CommandHandler("descripcion_ai", descripcion_ai_command))
+    application.add_handler(CommandHandler("bio", descripcion_ai_command))  # Alias
+    application.add_handler(CommandHandler("compatibilidad", compatibilidad_command))
+
+    logger.info("AI-powered commands registered")
 
     # Group handlers - auto-sync admins
     application.add_handler(

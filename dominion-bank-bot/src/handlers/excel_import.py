@@ -8,9 +8,9 @@ from pathlib import Path
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from src.config import settings
 from src.database.connection import get_session
 from src.database.repositories import UserRepository
+from src.utils.helpers import is_admin
 
 logger = logging.getLogger(__name__)
 
@@ -20,8 +20,8 @@ async def importar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     if not update.effective_user or not update.message:
         return
 
-    # Check if user is admin
-    if update.effective_user.id not in settings.super_admin_ids:
+    # Check if user is admin (super_admin or database admin)
+    if not await is_admin(update.effective_user.id):
         await update.message.reply_text("❌ Solo los administradores pueden importar datos.")
         return
 
@@ -54,8 +54,8 @@ async def handle_excel_document(update: Update, context: ContextTypes.DEFAULT_TY
     if not update.effective_user or not update.message or not update.message.document:
         return
 
-    # Check if user is admin
-    if update.effective_user.id not in settings.super_admin_ids:
+    # Check if user is admin (super_admin or database admin)
+    if not await is_admin(update.effective_user.id):
         return
 
     document = update.message.document
@@ -189,8 +189,8 @@ async def exportar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     if not update.effective_user or not update.message:
         return
 
-    # Check if user is admin
-    if update.effective_user.id not in settings.super_admin_ids:
+    # Check if user is admin (super_admin or database admin)
+    if not await is_admin(update.effective_user.id):
         await update.message.reply_text("❌ Solo los administradores pueden exportar datos.")
         return
 

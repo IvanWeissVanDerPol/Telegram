@@ -1,0 +1,115 @@
+# The Phantom Bot - Error, Warning & Info Messages
+# Use {variable} for dynamic values
+
+# Error messages
+errors:
+  not_registered: "{error} No estas registrado. Usa /start primero."
+  user_not_found: "{error} Usuario no encontrado."
+  invalid_amount: "{error} Cantidad invalida. Debe ser un numero positivo."
+  insufficient_balance: "{error} Saldo insuficiente."
+  self_transfer: "{error} No puedes enviarte a ti mismo."
+  not_admin: "{error} No tienes permisos de administrador."
+  cooldown: "{loading} Espera {seconds} segundos antes de volver a transferir."
+  min_amount: "{error} La cantidad minima es {min_amount} {currency}."
+  max_amount: "{error} La cantidad maxima es {max_amount} {currency}."
+  generic: "{error} Ocurrio un error inesperado. Intenta de nuevo."
+  permission_denied: "{error} No tienes permiso para hacer esto."
+  invalid_user: "{error} Usuario invalido o no especificado."
+  feature_disabled: "{error} Esta funcion esta deshabilitada."
+
+# BDSM specific errors
+bdsm_errors:
+  no_collar: "{error} No tienes collar puesto."
+  already_collared: "{error} Esta persona ya tiene collar."
+  not_your_sub: "{error} Esta persona no es tu sumis@."
+  not_in_dungeon: "{error} Esta persona no esta en el calabozo."
+  already_in_dungeon: "{error} Esta persona ya esta en el calabozo."
+  no_pending_collar: "{error} No tienes solicitudes de collar pendientes."
+  auction_not_found: "{error} Subasta no encontrada."
+  contract_not_found: "{error} Contrato no encontrado."
+  bid_too_low: "{error} La puja debe ser mayor a la actual."
+
+# Warning messages
+warnings:
+  debt: "{warning} Esto te dejara en deuda. Estas seguro?"
+  irreversible: "{warning} Esta accion es irreversible."
+  contract_break: "{warning} Romper un contrato tiene penalizacion."
+
+# Info messages
+info:
+  no_changes: "{info} No hay cambios que guardar."
+  loading: "{loading} Cargando..."
+  processing: "{loading} Procesando..."
+  waiting_response: "{loading} Esperando respuesta..."
+
+# Usage messages (how to use commands)
+usage:
+  dar: |
+    {info} **Como usar /dar**
+
+    **Formato:** /dar @usuario cantidad
+
+    **Ejemplo:** /dar @maria 100
+
+    {divider_light}
+    Envia {currency} a otro usuario.
+
+  dar_admin: |
+    {info} **Como usar /dar_admin**
+
+    **Formato:** /dar_admin @usuario cantidad
+
+    **Ejemplo:** /dar_admin @maria 500
+
+    {divider_light}
+    Solo administradores.
+
+  quitar: |
+    {info} **Como usar /quitar**
+
+    **Formato:** /quitar @usuario cantidad
+
+    **Ejemplo:** /quitar @maria 100
+
+    {divider_light}
+    Solo administradores.
+
+  consultar: |
+    {info} **Como usar /consultar**
+
+    **Formato:** /consultar @usuario
+
+    **Ejemplo:** /consultar @maria
+
+    {divider_light}
+    Solo administradores.
+
+  collar: |
+    {info} **Como usar /collar**
+
+    **Formato:** /collar @usuario
+
+    **Ejemplo:** /collar @sumis@
+
+    {divider_light}
+    Pone tu collar a otro usuario (costo: 300).
+
+  subasta: |
+    {info} **Como usar /subasta**
+
+    **Formato:** /subasta @usuario precio_inicial
+
+    **Ejemplo:** /subasta @sumis@ 100
+
+    {divider_light}
+    Inicia una subasta de 24 horas.
+
+  contrato: |
+    {info} **Como usar /contrato**
+
+    **Formato:** /contrato @usuario terminos
+
+    **Ejemplo:** /contrato @sumis@ Servir por 7 dias
+
+    {divider_light}
+    Propone un contrato D/s.

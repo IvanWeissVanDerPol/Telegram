@@ -275,6 +275,28 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 /mi_altar - Ver tu altar
 /devotos - Ver tus devotos""")
 
+    # AI-powered commands (always available)
+    help_sections.append("""🎲 JUEGOS IA:
+/ruleta - Ruleta del destino
+/dado_perverso [tipo] - Dado con IA
+/verdad_reto [v/r] - Verdad o Reto
+/prediccion [@user] - Oraculo
+/fantasia [tema] - Escenario fantasia""")
+
+    help_sections.append("""📝 TAREAS IA:
+/tarea [@user] - Generar tarea
+/reto @user - Lanzar reto
+/castigo_creativo @user - Castigo IA
+/recompensa @user - Recompensa IA
+/protocolo [@user] - Protocolo""")
+
+    help_sections.append("""🎭 ROLEPLAY IA:
+/escena [tema] - Ambientacion
+/ritual @user [tipo] - Ritual/ceremonia
+/titulo [rol] - Generar titulo
+/bio [rol] - Bio para perfil
+/compatibilidad @user - Analisis IA""")
+
     # Admin commands - only show to admins
     if is_admin:
         help_sections.append(f"""👑 ADMIN:

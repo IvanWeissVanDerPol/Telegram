@@ -20,6 +20,10 @@ class Settings(BaseSettings):
     telegram_api_id: Optional[str] = Field(default=None, alias="TELEGRAM_API_ID")
     telegram_api_hash: Optional[str] = Field(default=None, alias="TELEGRAM_API_HASH")
 
+    # AI Service (Groq)
+    groq_api_key: Optional[str] = Field(default=None, alias="GROQ_API_KEY")
+    enable_ai_features: bool = Field(default=True, alias="ENABLE_AI_FEATURES")
+
     # Bot Identity
     bot_name: str = Field(default="The Phantom", alias="BOT_NAME")
     bot_username: str = Field(default="ThePhantomSadoBot", alias="BOT_USERNAME")

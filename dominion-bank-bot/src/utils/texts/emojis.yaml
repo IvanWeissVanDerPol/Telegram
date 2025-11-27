@@ -1,0 +1,94 @@
+# The Phantom Bot - Emoji Definitions
+# All emojis used throughout the bot
+
+# Visual dividers
+dividers:
+  default: "━━━━━━━━━━━━━━━━━━━━"
+  light: "┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈"
+  double: "══════════════════════"
+
+# Status emojis
+status:
+  success: "✅"
+  error: "❌"
+  warning: "⚠️"
+  info: "ℹ️"
+  loading: "⏳"
+  gift: "🎁"
+
+# Feature emojis
+features:
+  balance: "💰"
+  transfer: "💸"
+  ranking: "🏆"
+  history: "📜"
+  profile: "👤"
+  admin: "👑"
+  bot: "🎭"
+
+# BDSM system emojis
+bdsm:
+  collar: "⛓️"
+  whip: "🔥"
+  dungeon: "🏰"
+  auction: "🔨"
+  tribute: "💎"
+  contract: "📜"
+
+# Role emojis
+roles:
+  dom: "👑"
+  sub: "🔗"
+  switch: "🔄"
+
+# Privacy emojis
+privacy:
+  public: "🌍"
+  friends: "👥"
+  private: "🔒"
+
+# Ranking medals
+medals:
+  - "👑"
+  - "🥈"
+  - "🥉"
+
+# AI command emojis
+ai:
+  dice: "🎲"
+  roulette: "🎰"
+  crystal: "🔮"
+  fantasy: "🌌"
+  task: "📝"
+  challenge: "⚔️"
+  reward: "🌟"
+  scene: "🏰"
+  ritual: "🕯️"
+  title: "👑"
+  compatibility: "💕"
+
+# Mystical symbols (for AI predictions)
+mystical:
+  - "✨"
+  - "🌙"
+  - "⭐"
+  - "🌟"
+  - "💫"
+
+# Dice faces for dado_perverso
+dice_faces:
+  - "1️⃣"
+  - "2️⃣"
+  - "3️⃣"
+  - "4️⃣"
+  - "5️⃣"
+  - "6️⃣"
+
+# Ritual type emojis
+ritual_types:
+  sumision: "🛐"
+  collar: "⭕"
+  castigo: "⚡"
+  recompensa: "🌟"
+  iniciacion: "🔥"
+  devocion: "💎"

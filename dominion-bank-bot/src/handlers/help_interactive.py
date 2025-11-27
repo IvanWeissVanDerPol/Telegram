@@ -27,6 +27,9 @@ class HelpCategory(str, Enum):
     AUCTIONS = "help_auctions"
     CONTRACTS = "help_contracts"
     TRIBUTES = "help_tributes"
+    AI_GAMES = "help_ai_games"
+    AI_TASKS = "help_ai_tasks"
+    AI_ROLEPLAY = "help_ai_roleplay"
     ADMIN = "help_admin"
 
 
@@ -146,6 +149,52 @@ Romper un contrato tiene penalizacion."""
 Los tributos se acumulan en el altar.
 Adorar aumenta el nivel de devocion."""
     },
+    HelpCategory.AI_GAMES: {
+        "title": "Juegos con IA",
+        "icon": "game_die",
+        "content": """/ruleta - Ruleta del destino (IA)
+/dado_perverso [tipo] - Dado con interpretacion IA
+/dado - (alias corto)
+/verdad_reto [v/r] - Verdad o Reto IA
+/vor - (alias corto)
+/prediccion [@user] - Prediccion del oraculo
+/oraculo - (alias)
+/fantasia [tema] - Escenario de fantasia
+
+Tipos de dado: accion, intensidad, zona,
+duracion, destino
+
+Genera contenido dinamico con IA."""
+    },
+    HelpCategory.AI_TASKS: {
+        "title": "Tareas con IA",
+        "icon": "memo",
+        "content": """/tarea [@user] - Generar tarea para sumis@
+/reto @user - Lanzar reto a alguien
+/castigo_creativo @user [por razon] - Castigo IA
+/castigocreativo - (alias)
+/recompensa @user - Generar recompensa IA
+/protocolo [@user] - Generar protocolo de comportamiento
+
+Estos comandos usan IA para generar
+contenido creativo y personalizado."""
+    },
+    HelpCategory.AI_ROLEPLAY: {
+        "title": "Roleplay con IA",
+        "icon": "performing_arts",
+        "content": """/escena [tema] - Generar ambientacion
+/ambiente - (alias)
+/ritual @user [tipo] - Ritual/ceremonia IA
+/titulo [rol] - Generar titulo BDSM
+/descripcion_ai [rol] - Generar bio para perfil
+/bio - (alias)
+/compatibilidad @user [rol1] [rol2] - Analisis IA
+
+Tipos de ritual: sumision, collar, castigo,
+recompensa, iniciacion, devocion
+
+Crea escenas y contenido inmersivo."""
+    },
     HelpCategory.ADMIN: {
         "title": "Administracion",
         "icon": "crown",
@@ -219,6 +268,26 @@ def get_main_keyboard(is_admin: bool = False) -> InlineKeyboardMarkup:
                 ),
             ],
         ])
+
+    # AI-powered commands (always available)
+    keyboard.extend([
+        [
+            InlineKeyboardButton(
+                "Juegos IA",
+                callback_data=HelpCategory.AI_GAMES
+            ),
+            InlineKeyboardButton(
+                "Tareas IA",
+                callback_data=HelpCategory.AI_TASKS
+            ),
+        ],
+        [
+            InlineKeyboardButton(
+                "Roleplay IA",
+                callback_data=HelpCategory.AI_ROLEPLAY
+            ),
+        ],
+    ])
 
     # Admin section only for admins
     if is_admin:

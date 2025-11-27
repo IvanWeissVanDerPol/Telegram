@@ -1,0 +1,281 @@
+# The Phantom Bot - AI Command Response Templates
+# Templates for AI-powered commands
+
+# Roulette command
+roulette:
+  spinning: "{roulette} La ruleta gira..."
+
+  response: |
+    {roulette} *RULETA DEL DESTINO* {roulette}
+
+    {emoji} *{user_name}*, {description}!
+
+    {content}
+
+  options:
+    reward:
+      weight: 15
+      description: "has ganado un premio"
+      emoji: "{reward}"
+    punishment:
+      weight: 20
+      description: "recibes un castigo"
+      emoji: "{whip}"
+    task:
+      weight: 25
+      description: "tienes una tarea"
+      emoji: "{task}"
+    dare:
+      weight: 20
+      description: "debes cumplir un reto"
+      emoji: "{whip}"
+    skip:
+      weight: 10
+      description: "te has salvado... por ahora"
+      emoji: "😅"
+    double:
+      weight: 5
+      description: "DOBLE o NADA"
+      emoji: "{dice}"
+    mystery:
+      weight: 5
+      description: "el misterio te espera"
+      emoji: "{crystal}"
+
+# Dice command
+dice:
+  rolling: "{dice} Lanzando el dado..."
+
+  response: |
+    {dice} *DADO PERVERSO* {dice}
+
+    {user_name} lanza el dado de *{dice_type}*...
+
+    {dice_face} El dado cae en: *{result_number}*
+
+    *Resultado:* {result_text}
+
+    {interpretation}
+
+    _Tipos disponibles: {available_types}_
+    _Usa: /dado_perverso [tipo]_
+
+  types:
+    accion:
+      - "Azotar"
+      - "Besar"
+      - "Acariciar"
+      - "Morder"
+      - "Atar"
+      - "Vendar"
+    intensidad:
+      - "Suave"
+      - "Moderado"
+      - "Intenso"
+      - "Extremo"
+      - "A eleccion del Dom"
+      - "Sorpresa"
+    zona:
+      - "Espalda"
+      - "Gluteos"
+      - "Piernas"
+      - "Cuello"
+      - "Manos"
+      - "A eleccion"
+    duracion:
+      - "1 minuto"
+      - "5 minutos"
+      - "10 minutos"
+      - "15 minutos"
+      - "30 minutos"
+      - "Hasta que el Dom decida"
+    destino:
+      - "Recompensa"
+      - "Castigo"
+      - "Tarea"
+      - "Reto"
+      - "Libertad"
+      - "Calabozo"
+
+# Truth or Dare command
+truth_or_dare:
+  response: |
+    {scene} *VERDAD O RETO* {scene}
+
+    {emoji} *{user_name}*, te toca *{title}*!
+
+    {content}
+
+    _Usa /verdad_reto [verdad|reto] para elegir_
+
+  truth:
+    emoji: "{crystal}"
+    title: "VERDAD"
+  dare:
+    emoji: "{whip}"
+    title: "RETO"
+
+# Prediction command
+prediction:
+  consulting: "{crystal} Consultando el oraculo..."
+
+  response: |
+    {crystal} *EL ORACULO HABLA* {crystal}
+
+    {symbols}
+
+    *Prediccion para {target_name}:*
+
+    {prediction}
+
+    {symbols}
+
+    _El destino esta escrito en las estrellas..._
+
+# Fantasy command
+fantasy:
+  response: |
+    {fantasy} *ESCENARIO DE FANTASIA* {fantasy}
+
+    {content}
+
+    _Temas disponibles: {themes}_
+    _Usa: /fantasia [tema]_
+
+  themes:
+    - "medieval"
+    - "vampiros"
+    - "piratas"
+    - "mansion"
+    - "academia"
+    - "futuro"
+
+# Task command
+task:
+  response: |
+    {task} *NUEVA TAREA* {task}
+
+    {dom} *{dom_name}* ordena:
+
+    {content}
+
+    _Para: {target_name}_
+
+# Challenge command
+challenge:
+  response: |
+    {challenge} *RETO LANZADO* {challenge}
+
+    {challenger_name} reta a {target_name}!
+
+    {content}
+
+    {whip} _El honor esta en juego..._
+
+# Creative punishment command
+creative_punishment:
+  response: |
+    {whip} *CASTIGO DECRETADO* {whip}
+
+    {dom} *{dom_name}* castiga a *{target_name}*
+    {reason}
+
+    {content}
+
+    {collar} _Que sirva de leccion..._
+
+# Reward command
+reward:
+  response: |
+    {reward} *RECOMPENSA OTORGADA* {reward}
+
+    {dom} *{dom_name}* recompensa a *{target_name}*
+
+    {content}
+
+    {tribute} _La obediencia tiene sus frutos..._
+
+# Protocol command
+protocol:
+  response: |
+    {contract} *PROTOCOLO DE COMPORTAMIENTO* {contract}
+
+    Para: *{target_name}*
+
+    {content}
+
+    {warning} _El incumplimiento tendra consecuencias..._
+
+# Scene command
+scene:
+  response: |
+    {scene} *AMBIENTACION* {scene}
+
+    *{theme}*
+
+    {content}
+
+    _Usa /escena [tema] para especificar_
+
+  default_themes:
+    - "mazmorra oscura"
+    - "salon elegante"
+    - "habitacion secreta"
+    - "jardin nocturno"
+    - "biblioteca privada"
+
+# Ritual command
+ritual:
+  response: |
+    {ritual_emoji} *RITUAL DE {ritual_type}* {ritual_emoji}
+
+    {dom} *{dom_name}* y {sub} *{sub_name}*
+
+    {content}
+
+    {ritual} _El ritual ha sido completado..._
+
+  types:
+    - "sumision"
+    - "collar"
+    - "castigo"
+    - "recompensa"
+    - "iniciacion"
+    - "devocion"
+
+# Title command
+title:
+  response: |
+    {title_emoji} *TITULO OTORGADO* {title_emoji}
+
+    *{user_name}* ({role})
+
+    {content}
+
+    {contract} _Que este titulo sea tu emblema..._
+
+# Bio/Description command
+bio:
+  response: |
+    *BIOGRAFIA GENERADA*
+
+    Para: *{user_name}* ({role})
+
+    {content}
+
+    _Puedes copiar esto para tu perfil con /editarperfil_
+
+# Compatibility command
+compatibility:
+  analyzing: "{compatibility} Analizando compatibilidad..."
+
+  response: |
+    {compatibility} *ANALISIS DE COMPATIBILIDAD* {compatibility}
+
+    {profile} *{user1_name}* ({user1_role})
+         ❤️
+    {profile} *{user2_name}* ({user2_role})
+
+    {content}
+
+    _Los astros han hablado..._

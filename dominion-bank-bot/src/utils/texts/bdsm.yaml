@@ -1,0 +1,244 @@
+# The Phantom Bot - BDSM Command Messages
+# Collars, punishments, dungeon, auctions, contracts, tributes
+
+# Collar messages
+collars:
+  request_sent: |
+    {collar} **Solicitud de collar enviada**
+
+    {profile} Para: {target}
+    {balance_emoji} Costo: {cost}
+
+    {loading} Esperando respuesta...
+
+  request_received: |
+    {collar} **Solicitud de collar!**
+
+    {dom} {owner} quiere ponerte su collar
+
+    {divider_light}
+
+    {success} /aceptar_collar {request_id} - Aceptar
+    {error} /rechazar_collar {request_id} - Rechazar
+
+    {loading} Tienes 5 minutos para responder
+
+  accepted: |
+    {collar} **Collar aceptado!**
+
+    {sub} {sub_name} ahora lleva el collar de {dom} {owner}
+
+    {divider_light}
+    {balance_emoji} -{cost}
+
+  rejected: |
+    {error} **Collar rechazado**
+
+    {sub} {sub_name} ha rechazado el collar de {owner}
+
+  removed: |
+    {collar} **Collar removido**
+
+    {sub} {sub_name} ya no lleva el collar de {dom} {owner}
+
+  status_free: |
+    {collar} **Estado de collar**
+
+    {public} Estas libre, sin collar.
+
+  status_owned: |
+    {collar} **Tu collar**
+
+    {dom} Llevas el collar de **{owner}**
+    {loading} Desde hace {since}
+
+  subs_list_empty: |
+    {collar} **Tus sumis@s**
+
+    {info} No tienes a nadie con tu collar.
+
+  subs_list_header: "{collar} **Sumis@s de {owner}**"
+  subs_list_entry: "**{num}.** {sub} {name}\n    - Desde hace {since}"
+  subs_list_footer: |
+    {divider_light}
+    **Total:** {count} sumis@(s)
+
+# Punishment messages
+punishments:
+  given: |
+    {whip} **Castigo aplicado!**
+
+    {dom} {punisher} ha castigado a {sub} {target}
+
+    {divider_light}
+
+    Tipo: {punishment_type}{reason}
+    {balance_emoji} **Costo:** -{cost}
+
+  list_empty: |
+    {whip} **Castigos {role}**
+
+    {info} No hay castigos registrados.
+
+  list_header: "{whip} **Castigos {role} por {user}**"
+  list_entry: "**{num}.** {emoji} {target_or_from}\n    - {reason}\n    - {time}"
+  list_footer: |
+    {divider_light}
+    **Total:** {count} castigo(s)
+
+# Dungeon messages
+dungeon:
+  locked: |
+    {dungeon} **Al calabozo!**
+
+    {dom} {jailer} ha encerrado a {sub} {prisoner}
+
+    {divider_light}
+
+    {loading} **Duracion:** {hours} horas{reason}
+    {balance_emoji} **Costo:** -{cost}
+
+  released: |
+    {dungeon} **Libertad!**
+
+    {success} {prisoner} ha sido liberado del calabozo
+
+  status_free: |
+    {dungeon} **Estado del calabozo**
+
+    {success} Estas libre, no estas en el calabozo.
+
+  status_locked: |
+    {dungeon} **Estas en el calabozo**
+
+    {dom} Encerrado/a por: **{jailer}**
+    {loading} Tiempo restante: **{remaining}**{reason}
+
+  prisoners_empty: |
+    {dungeon} **Presos actuales**
+
+    {info} No hay nadie en el calabozo.
+
+  prisoners_header: "{dungeon} **Presos en el calabozo**"
+  prisoners_entry: "**{num}.** {sub} {name}\n    - Por {jailer} - {remaining} restante"
+
+# Auction messages
+auctions:
+  created: |
+    {auction} **Nueva subasta creada**
+
+    ID: #{auction_id}
+    Articulo: {item}
+    {balance_emoji} **Puja inicial:** {starting_bid}
+    {loading} **Duracion:** {duration_hours} horas
+
+    {divider_light}
+    {info} /pujar {auction_id} [cantidad] - Para pujar
+
+  bid: |
+    {auction} **Nueva puja!**
+
+    Subasta: #{auction_id}
+    {profile} **Pujador:** {bidder}
+    {balance_emoji} **Cantidad:** {amount}
+
+  won: |
+    {auction} **Subasta finalizada!**
+
+    Subasta: #{auction_id}
+    Articulo: {item}
+
+    {divider_light}
+
+    {success} **Ganador:** {winner}
+    {balance_emoji} **Precio final:** {amount}
+
+  list_empty: |
+    {auction} **Subastas activas**
+
+    {info} No hay subastas activas en este momento.
+
+  list_header: "{auction} **Subastas activas**"
+  list_entry: "**#{id}** - {item}\n    - Puja actual: {current_bid}\n    - Termina: {ends}"
+  list_footer: |
+    {divider_light}
+    {info} /pujar [id] [cantidad] - Para participar
+
+# Contract messages
+contracts:
+  created: |
+    {contract} **Contrato creado**
+
+    ID: #{contract_id}
+    {dom} **Dominante:** {dom_name}
+    {sub} **Sumis@:** {sub_name}
+
+    {divider_light}
+
+    **Terminos:**
+    {terms}
+
+    {loading} **Duracion:** {duration_days} dias
+
+  signed: |
+    {success} **Contrato firmado!**
+
+    **Contrato #{contract_id}**
+
+    {dom} {dom_name} y {sub} {sub_name}
+    han firmado el contrato.
+
+  broken: |
+    {error} **Contrato roto**
+
+    **Contrato #{contract_id}**
+
+    {warning} {breaker} ha roto el contrato
+    {balance_emoji} **Penalizacion:** -{penalty}
+
+  list_empty: |
+    {contract} **Tus contratos**
+
+    {info} No tienes contratos activos.
+
+  list_header: "{contract} **Contratos de {user}**"
+  list_entry: "**#{id}** - {role} con {partner}\n    - Expira: {expires}"
+  list_footer: |
+    {divider_light}
+    **Total:** {count} contrato(s) activo(s)
+
+# Tribute messages
+tributes:
+  paid: |
+    {tribute} **Tributo pagado**
+
+    {sub} {payer} ha tributado a {dom} {recipient}
+
+    {divider_light}
+
+    {balance_emoji} **Cantidad:** {amount}{message}
+
+  received: |
+    {tribute} **Has recibido un tributo!**
+
+    {sub} {payer} te ha tributado
+    {balance_emoji} **{amount}**{message}
+
+  altar_empty: |
+    {tribute} **Altar de {user}**
+
+    {info} Este altar esta vacio. Se el primero en tributar.
+
+  altar_header: "{tribute} **Altar de {user}**"
+  altar_stats: |
+    {balance_emoji} **Total recibido:** {total}
+    **Devotos:** {devotees}
+    **Tributos:** {tributes_count}
+
+  devotees_empty: |
+    {tribute} **Tus devotos**
+
+    {info} No tienes devotos aun.
+
+  devotees_header: "{tribute} **Devotos de {user}**"
+  devotees_entry: "**{num}.** {sub} {name} - {total} tributos"

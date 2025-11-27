@@ -1,0 +1,149 @@
+# The Phantom Bot - Core Command Messages
+# Welcome, balance, transfer, ranking, history, profile
+
+# Welcome messages
+welcome:
+  new_user: |
+    {bot} **Bienvenido/a a {bot_name}!**
+
+    Hola {display_name}, soy tu companero para gestionar
+    {currency} {currency_emoji} en el grupo.
+
+    {divider}
+    {balance_emoji} **Tu saldo inicial:** {balance}
+    {divider}
+
+    {info} **Comandos basicos:**
+    - /ver - Consulta tu saldo
+    - /dar @user cantidad - Envia {currency}
+    - /ranking - Top usuarios
+    - /historial - Tus movimientos
+    - /perfil - Tu perfil
+
+    {collar} /help - Ver todos los comandos
+
+  returning_user: |
+    {bot} **Hola de nuevo!**
+
+    Bienvenido/a de vuelta, {display_name}
+
+    {divider}
+    {balance_emoji} **Tu saldo:** {balance}
+    {divider}
+
+# Balance messages
+balance:
+  check_zero: |
+    {currency_emoji} **Tu saldo**
+
+    {balance_emoji} 0 {currency}
+
+    {divider_light}
+    {info} Aun no tienes {currency}.
+    Pide a alguien que te envie o usa /help
+
+  check_positive: |
+    {currency_emoji} **Tu saldo**
+
+    {balance_emoji} {balance}
+
+  query: |
+    {profile} **Consulta de saldo**
+
+    {balance_emoji} @{username} tiene:
+    **{balance}**
+
+# Transfer messages
+transfer:
+  success_sender: |
+    {success} **Transferencia exitosa**
+
+    {transfer_emoji} Enviaste **{amount}**
+    {profile} Destinatario: {recipient}
+
+    {divider_light}
+    {balance_emoji} Tu nuevo saldo: {new_balance}
+
+  success_recipient: |
+    {gift} **Has recibido {currency}!**
+
+    {transfer_emoji} **{amount}**
+    {profile} De: {sender}
+
+    {divider_light}
+    {balance_emoji} Tu nuevo saldo: {new_balance}
+
+# Admin messages
+admin:
+  give: |
+    {admin} **{currency} otorgados**
+
+    {transfer_emoji} +**{amount}**
+    {profile} Para: {recipient}
+    {admin} Por: {admin_name}
+
+    {divider_light}
+    {balance_emoji} Nuevo saldo de {recipient}: {new_balance}
+
+  remove: |
+    {admin} **{currency} removidos**
+
+    {transfer_emoji} -**{amount}**
+    {profile} De: {target}
+    {admin} Por: {admin_name}
+
+    {divider_light}
+    {balance_emoji} Nuevo saldo de {target}: {new_balance}
+
+  set_admin: |
+    {success} **Administrador asignado**
+
+    {admin} @{username} ahora es administrador
+
+  remove_admin: |
+    {success} **Administrador removido**
+
+    {profile} @{username} ya no es administrador
+
+# Ranking messages
+ranking:
+  header: "{ranking} **Ranking de {currency}**"
+  entry: "{medal} {name}\n    - {balance}"
+  footer: |
+    {divider}
+    Tu posicion: #{position}
+    {balance_emoji} {balance}
+
+# History messages
+history:
+  header: "{history} **Tu historial**"
+  empty: |
+    {history} **Tu historial**
+
+    {info} No tienes transacciones aun.
+
+    {divider}
+    {balance_emoji} Saldo actual: {balance}
+
+  sent: "**{num}.** {transfer_emoji} -{amount}\n    - -> {other} - {time}"
+  received: "**{num}.** {gift} +{amount}\n    - <- {other} - {time}"
+  admin_give: "**{num}.** {admin} +{amount}\n    - Admin - {time}"
+  admin_remove: "**{num}.** {warning} -{amount}\n    - Admin - {time}"
+
+# Profile messages
+profile:
+  view: |
+    {profile} **Perfil de {display_name}**{pronouns}
+
+    {role} | {experience}{age}
+
+    {divider_light}
+
+    {bio}
+
+    {divider_light}
+
+    {balance_emoji} **Saldo:** {balance}
+    {collar_status}
+    {sub} **Sumis@s:** {subs_count}
+    {contract} **Contratos:** {contracts_count}{edit_hint}

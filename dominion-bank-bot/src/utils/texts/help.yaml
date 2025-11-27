@@ -1,0 +1,331 @@
+# The Phantom Bot - Help Content
+# Interactive help system content
+
+# Help categories
+categories:
+  basic:
+    title: "Comandos Basicos"
+    icon: "money_bag"
+    content: |
+      /start - Registrarse en el bot
+      /ver - Ver tu saldo actual
+      /dar @user cantidad - Enviar {currency}
+      /ranking - Top 10 usuarios
+      /historial - Tus ultimas transacciones
+      /stats - Estadisticas generales
+
+      Aliases:
+      - /saldo = /ver
+      - /enviar = /dar
+      - /top = /ranking
+      - /historia = /historial
+
+  profile:
+    title: "Perfil"
+    icon: "bust_in_silhouette"
+    content: |
+      /perfil - Ver tu perfil
+      /perfil @user - Ver perfil de otro usuario
+      /editarperfil - Modificar tu perfil (wizard)
+      /editarperfil_wizard - Editor interactivo de perfil
+      /configuracion - Ajustes de privacidad
+
+      El perfil muestra tu rol, experiencia,
+      biografia, y otros datos personales.
+
+  collars:
+    title: "Sistema de Collares"
+    icon: "link"
+    content: |
+      /collar @user - Poner collar (costo: 300)
+      /liberar @user - Liberar a tu sumiso
+      /exhibir - Ver tus collares
+      /miscollares - (alias de /exhibir)
+      /amo - Ver quien es tu Amo/Ama
+      /ama - (alias de /amo)
+      /aceptar_collar - Aceptar collar pendiente
+      /rechazar_collar - Rechazar collar pendiente
+      /suplicar_libertad - Pedir libertad a tu Amo
+
+      El collar representa una relacion D/s.
+      Solo puedes tener un Amo/Ama a la vez.
+
+  punishments:
+    title: "Sistema de Castigos"
+    icon: "high_voltage"
+    content: |
+      /azotar @user [razon] - Azotar (costo: 50)
+      /castigar @user tipo razon - Aplicar castigo
+      /mis_castigos - Ver castigos recibidos
+      /miscastigos - (alias)
+      /castigos_dados - Ver castigos que has dado
+
+      Tipos de castigo disponibles:
+      - Azote (basico)
+      - Restriccion
+      - Humillacion
+      - Tarea
+      - Silencio
+
+  dungeon:
+    title: "El Calabozo"
+    icon: "european_castle"
+    content: |
+      /calabozo @user [horas] - Encerrar (costo: 200)
+      /encerrar - (alias de /calabozo)
+      /liberar_calabozo @user - Liberar preso
+      /mi_calabozo - Ver tu estado de encierro
+      /micalbozo - (alias)
+      /presos - Ver todos los presos
+      /suplicar_libertad_calabozo - Pedir salir
+
+      Los presos no pueden usar ciertos comandos.
+      Duracion maxima: 168 horas (1 semana).
+
+  auctions:
+    title: "Sistema de Subastas"
+    icon: "hammer"
+    content: |
+      /subasta @user precio_inicial - Iniciar subasta
+      /pujar subasta_id cantidad - Hacer una puja
+      /subastas - Ver subastas activas
+      /ver_subasta id - Ver detalles de subasta
+      /mis_subastas - Ver tus subastas
+      /cancelar_subasta id - Cancelar tu subasta
+
+      Las subastas duran 24 horas por defecto.
+      El ganador recibe un collar temporal.
+
+  contracts:
+    title: "Sistema de Contratos"
+    icon: "scroll"
+    content: |
+      /contrato @user terminos - Proponer contrato
+      /firmar_contrato id - Firmar un contrato
+      /rechazar_contrato id - Rechazar propuesta
+      /romper_contrato id - Romper contrato (costo: 500)
+      /mis_contratos - Ver tus contratos
+      /miscontratos - (alias)
+      /ver_contrato id - Ver detalles
+
+      Los contratos son acuerdos formales D/s.
+      Romper un contrato tiene penalizacion.
+
+  tributes:
+    title: "Sistema de Tributos"
+    icon: "pray"
+    content: |
+      /tributo @user cantidad - Dar tributo
+      /adorar @user - Adorar (gratis)
+      /altar @user - Ver altar de alguien
+      /mi_altar - Ver tu propio altar
+      /mialtar - (alias)
+      /devotos - Ver tus devotos
+
+      Los tributos se acumulan en el altar.
+      Adorar aumenta el nivel de devocion.
+
+  ai_games:
+    title: "Juegos con IA"
+    icon: "game_die"
+    content: |
+      /ruleta - Ruleta del destino (IA)
+      /dado_perverso [tipo] - Dado con interpretacion IA
+      /dado - (alias corto)
+      /verdad_reto [v/r] - Verdad o Reto IA
+      /vor - (alias corto)
+      /prediccion [@user] - Prediccion del oraculo
+      /oraculo - (alias)
+      /fantasia [tema] - Escenario de fantasia
+
+      Tipos de dado: accion, intensidad, zona,
+      duracion, destino
+
+      Genera contenido dinamico con IA.
+
+  ai_tasks:
+    title: "Tareas con IA"
+    icon: "memo"
+    content: |
+      /tarea [@user] - Generar tarea para sumis@
+      /reto @user - Lanzar reto a alguien
+      /castigo_creativo @user [por razon] - Castigo IA
+      /castigocreativo - (alias)
+      /recompensa @user - Generar recompensa IA
+      /protocolo [@user] - Generar protocolo de comportamiento
+
+      Estos comandos usan IA para generar
+      contenido creativo y personalizado.
+
+  ai_roleplay:
+    title: "Roleplay con IA"
+    icon: "performing_arts"
+    content: |
+      /escena [tema] - Generar ambientacion
+      /ambiente - (alias)
+      /ritual @user [tipo] - Ritual/ceremonia IA
+      /titulo [rol] - Generar titulo BDSM
+      /descripcion_ai [rol] - Generar bio para perfil
+      /bio - (alias)
+      /compatibilidad @user [rol1] [rol2] - Analisis IA
+
+      Tipos de ritual: sumision, collar, castigo,
+      recompensa, iniciacion, devocion
+
+      Crea escenas y contenido inmersivo.
+
+  admin:
+    title: "Administracion"
+    icon: "crown"
+    content: |
+      /dar_admin @user cantidad - Dar {currency}
+      /daradmin - (alias)
+      /quitar @user cantidad - Quitar {currency}
+      /consultar @user - Ver saldo de usuario
+      /setadmin @user - Hacer admin
+      /removeadmin @user - Quitar admin
+      /syncadmins - Sincronizar admins del grupo
+
+      Usuarios/Saldos (Excel):
+      /importar - Importar usuarios (Excel)
+      /exportar - Exportar usuarios (Excel)
+
+      Perfiles (Excel/Google Sheets):
+      /plantilla_perfiles - Generar plantilla Excel
+      /exportar_perfiles - Exportar perfiles (Excel)
+      /importar_perfiles - Importar perfiles (Excel)
+
+      Sistema:
+      /cleandb - Limpiar base de datos
+      /runtest - Ejecutar tests automaticos
+      /testdb - Test rapido de conexion
+      /health - Estado del bot
+      /ping - Verificar respuesta
+
+# Main help menu
+main_help:
+  header: |
+    {bot} **{bot_name} - Ayuda{admin_note}**
+
+    Selecciona una categoria para ver los comandos disponibles:
+
+    Moneda: {currency} ({currency_symbol})
+    Saldo inicial: {default_balance} {currency_symbol}
+
+# Static help (for /help command)
+static_help:
+  header: "{bot} **{bot_name} - Comandos{admin_note}**"
+
+  basic_section: |
+    {balance_emoji} BASICOS:
+    /start - Registrarse en el bot
+    /ver - Ver tu saldo actual
+    /dar @user cantidad - Enviar {currency}
+    /ranking - Top 10 usuarios
+    /historial - Tus ultimas transacciones
+    /stats - Estadisticas generales
+
+  profile_section: |
+    {profile} PERFIL:
+    /perfil - Ver tu perfil (o /perfil @user)
+    /editarperfil - Modificar tu perfil
+    /configuracion - Ajustes de privacidad
+
+  collars_section: |
+    {collar} COLLARES:
+    /collar @user - Poner collar (300 {currency_symbol})
+    /liberar @user - Liberar sumiso
+    /exhibir - Ver tus collares
+    /amo - Ver tu Amo/Ama
+    /aceptar_collar - Aceptar collar pendiente
+    /rechazar_collar - Rechazar collar
+    /suplicar_libertad - Pedir libertad
+
+  punishments_section: |
+    {whip} CASTIGOS:
+    /azotar @user [razon] - Azotar (50 {currency_symbol})
+    /castigar @user tipo razon - Castigar
+    /mis_castigos - Ver castigos recibidos
+    /castigos_dados - Ver castigos dados
+
+  dungeon_section: |
+    {dungeon} CALABOZO:
+    /calabozo @user [horas] - Encerrar (200 {currency_symbol})
+    /liberar_calabozo @user - Liberar preso
+    /mi_calabozo - Ver tu estado
+    /presos - Ver presos actuales
+    /suplicar_libertad_calabozo - Pedir salir
+
+  auctions_section: |
+    {auction} SUBASTAS:
+    /subasta @user precio_inicial - Subastar
+    /pujar subasta_id cantidad - Hacer puja
+    /subastas - Ver subastas activas
+    /ver_subasta id - Detalles de subasta
+    /mis_subastas - Tus subastas
+    /cancelar_subasta id - Cancelar
+
+  contracts_section: |
+    {contract} CONTRATOS:
+    /contrato @user terminos - Proponer
+    /firmar_contrato id - Firmar contrato
+    /rechazar_contrato id - Rechazar
+    /romper_contrato id - Romper (500 {currency_symbol})
+    /mis_contratos - Ver tus contratos
+    /ver_contrato id - Detalles
+
+  tributes_section: |
+    {tribute} TRIBUTOS:
+    /tributo @user cantidad - Dar tributo
+    /adorar @user - Adorar (gratis)
+    /altar @user - Ver altar de alguien
+    /mi_altar - Ver tu altar
+    /devotos - Ver tus devotos
+
+  ai_games_section: |
+    {dice} JUEGOS IA:
+    /ruleta - Ruleta del destino
+    /dado_perverso [tipo] - Dado con IA
+    /verdad_reto [v/r] - Verdad o Reto
+    /prediccion [@user] - Oraculo
+    /fantasia [tema] - Escenario fantasia
+
+  ai_tasks_section: |
+    {task} TAREAS IA:
+    /tarea [@user] - Generar tarea
+    /reto @user - Lanzar reto
+    /castigo_creativo @user - Castigo IA
+    /recompensa @user - Recompensa IA
+    /protocolo [@user] - Protocolo
+
+  ai_roleplay_section: |
+    {scene} ROLEPLAY IA:
+    /escena [tema] - Ambientacion
+    /ritual @user [tipo] - Ritual/ceremonia
+    /titulo [rol] - Generar titulo
+    /bio [rol] - Bio para perfil
+    /compatibilidad @user - Analisis IA
+
+  admin_section: |
+    {admin} ADMIN:
+    /dar_admin @user cantidad - Dar {currency}
+    /quitar @user cantidad - Quitar {currency}
+    /consultar @user - Ver saldo de usuario
+    /setadmin @user - Hacer admin
+    /removeadmin @user - Quitar admin
+    /syncadmins - Sincronizar admins del grupo
+
+    EXCEL (Usuarios/Saldos):
+    /importar - Importar usuarios
+    /exportar - Exportar usuarios
+
+    EXCEL (Perfiles/Google Sheets):
+    /plantilla_perfiles - Generar plantilla
+    /exportar_perfiles - Exportar perfiles
+    /importar_perfiles - Importar perfiles
+
+    TESTING:
+    /runtest - Ejecutar tests automaticos
+    /testdb - Test rapido de sistema
+    /health - Estado del bot
+    /ping - Verificar respuesta
