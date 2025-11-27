@@ -16,8 +16,24 @@ from src.database.repositories import (
     UserRepository,
 )
 from src.utils.helpers import extract_username, parse_amount
+from src.utils.messages import (
+    DIVIDER,
+    DIVIDER_LIGHT,
+    EMOJI_BALANCE,
+    EMOJI_ERROR,
+    EMOJI_INFO,
+    EMOJI_SUCCESS,
+    format_currency,
+)
 
 logger = logging.getLogger(__name__)
+
+# Custom emojis for tribute system
+EMOJI_TRIBUTE = "💎"
+EMOJI_CROWN = "👑"
+EMOJI_DEVOTEE = "🙇"
+EMOJI_ALTAR = "🏛️"
+EMOJI_WORSHIP = "✨"
 
 MIN_TRIBUTE = 10  # Minimum tribute amount
 
@@ -33,9 +49,15 @@ async def tributo_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     args = context.args if context.args else []
     if len(args) < 2:
         await update.message.reply_text(
-            "📝 Uso: /tributo @usuario cantidad\n"
-            f"💰 Mínimo: {MIN_TRIBUTE} {settings.currency_name}\n"
-            "Ejemplo: /tributo @Amo 100"
+            f"""{EMOJI_TRIBUTE} **Pagar Tributo**
+
+{DIVIDER_LIGHT}
+
+{EMOJI_INFO} **Uso:** /tributo @usuario cantidad
+
+{EMOJI_BALANCE} **Mínimo:** {format_currency(MIN_TRIBUTE)}
+
+**Ejemplo:** /tributo @Amo 100"""
         )
         return
 
@@ -43,12 +65,12 @@ async def tributo_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     amount = parse_amount(args[1]) if len(args) > 1 else None
 
     if not target_username:
-        await update.message.reply_text("❌ Debes especificar un usuario.")
+        await update.message.reply_text(f"{EMOJI_ERROR} Debes especificar un usuario.")
         return
 
     if amount is None or amount < MIN_TRIBUTE:
         await update.message.reply_text(
-            f"❌ El tributo mínimo es {MIN_TRIBUTE} {settings.currency_name}."
+            f"{EMOJI_ERROR} El tributo mínimo es {format_currency(MIN_TRIBUTE)}."
         )
         return
 
@@ -60,28 +82,36 @@ async def tributo_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         # Get tribute payer
         payer = await user_repo.get_by_telegram_id(update.effective_user.id)
         if not payer:
-            await update.message.reply_text("❌ Debes registrarte primero con /start")
+            await update.message.reply_text(f"{EMOJI_ERROR} Debes registrarte primero con /start")
             return
 
         # Check balance
         if payer.balance < amount:
             await update.message.reply_text(
-                f"❌ No tienes suficiente saldo.\n"
-                f"Tu saldo: {payer.balance} {settings.currency_name}\n"
-                f"Tributo: {amount} {settings.currency_name}"
+                f"""{EMOJI_ERROR} **Saldo Insuficiente**
+
+{DIVIDER_LIGHT}
+
+{EMOJI_BALANCE} Tu saldo: {format_currency(payer.balance)}
+{EMOJI_TRIBUTE} Tributo: {format_currency(amount)}"""
             )
             return
 
         # Get recipient
         recipient = await user_repo.get_by_username(target_username)
         if not recipient:
-            await update.message.reply_text("❌ Usuario no encontrado.")
+            await update.message.reply_text(f"{EMOJI_ERROR} Usuario no encontrado.")
             return
 
         # Check self-tribute
         if payer.id == recipient.id:
-            await update.message.reply_text("❌ No puedes pagarte tributo a ti mismo.")
+            await update.message.reply_text(f"{EMOJI_ERROR} No puedes pagarte tributo a ti mismo.")
             return
+
+        # Capture names before leaving session
+        payer_name = payer.display_name
+        recipient_name = recipient.display_name
+        new_payer_balance = payer.balance - amount
 
         # Transfer the tribute
         await user_repo.update_balance(payer.id, -amount)
@@ -93,23 +123,31 @@ async def tributo_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             recipient_id=recipient.id,
             amount=amount,
             transaction_type=TransactionType.TRIBUTE,
-            description=f"Tributo de {payer.display_name}",
+            description=f"Tributo de {payer_name}",
         )
 
         # Update altar stats
         await altar_repo.add_tribute(recipient.id, payer.id, amount)
 
-        logger.info(f"Tribute: {payer.display_name} paid {amount} to {recipient.display_name}")
+        logger.info(f"Tribute: {payer_name} paid {amount} to {recipient_name}")
 
     await update.message.reply_text(
-        f"""💎 **Tributo Pagado**
+        f"""{EMOJI_TRIBUTE} **Tributo Pagado** {EMOJI_WORSHIP}
 
-{payer.display_name} ha pagado tributo a {recipient.display_name}
+{DIVIDER}
 
-💰 Cantidad: {amount} {settings.currency_name}
+{EMOJI_DEVOTEE} **{payer_name}** se arrodilla ante **{recipient_name}**
 
-{payer.display_name}: {payer.balance - amount} {settings.currency_name}
-{recipient.display_name}: +{amount} {settings.currency_name}"""
+{DIVIDER_LIGHT}
+
+{EMOJI_BALANCE} **Cantidad:** {format_currency(amount)}
+
+{DIVIDER_LIGHT}
+
+{payer_name}: {format_currency(new_payer_balance)}
+{recipient_name}: +{format_currency(amount)}
+
+{EMOJI_CROWN} Gloria a {recipient_name}!"""
     )
 
 
@@ -124,16 +162,21 @@ async def adorar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     args = context.args if context.args else []
     if not args:
         await update.message.reply_text(
-            "📝 Uso: /adorar @usuario [mensaje]\n"
-            "Ejemplo: /adorar @Ama Es la más poderosa"
+            f"""{EMOJI_DEVOTEE} **Adorar**
+
+{DIVIDER_LIGHT}
+
+{EMOJI_INFO} **Uso:** /adorar @usuario [mensaje]
+
+**Ejemplo:** /adorar @Ama Es la mas poderosa"""
         )
         return
 
     target_username = extract_username(args[0])
-    message = " ".join(args[1:]) if len(args) > 1 else "Te adoro, mi señor/a"
+    message = " ".join(args[1:]) if len(args) > 1 else "Te adoro, mi senor/a"
 
     if not target_username:
-        await update.message.reply_text("❌ Debes especificar un usuario.")
+        await update.message.reply_text(f"{EMOJI_ERROR} Debes especificar un usuario.")
         return
 
     async with get_session() as session:
@@ -143,36 +186,46 @@ async def adorar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Get worshipper
         worshipper = await user_repo.get_by_telegram_id(update.effective_user.id)
         if not worshipper:
-            await update.message.reply_text("❌ Debes registrarte primero con /start")
+            await update.message.reply_text(f"{EMOJI_ERROR} Debes registrarte primero con /start")
             return
 
         # Get target
         target = await user_repo.get_by_username(target_username)
         if not target:
-            await update.message.reply_text("❌ Usuario no encontrado.")
+            await update.message.reply_text(f"{EMOJI_ERROR} Usuario no encontrado.")
             return
 
         # Check self-worship
         if worshipper.id == target.id:
-            await update.message.reply_text("❌ No puedes adorarte a ti mismo. 😏")
+            await update.message.reply_text(f"{EMOJI_ERROR} No puedes adorarte a ti mismo.")
             return
 
         # Check if worshipper wears target's collar (special message)
         collar = await collar_repo.get_by_sub(worshipper.id)
         is_collared = collar and collar.owner_id == target.id
 
-        collar_msg = "\n⛓️ (Lleva su collar)" if is_collared else ""
+        # Capture names before leaving session
+        worshipper_name = worshipper.display_name
+        target_name = target.display_name
 
-        logger.info(f"Worship: {worshipper.display_name} worshipped {target.display_name}")
+        collar_msg = "\n\n⛓️ _(Lleva su collar)_" if is_collared else ""
+
+        logger.info(f"Worship: {worshipper_name} worshipped {target_name}")
 
     await update.message.reply_text(
-        f"""🙇 **Adoración**
+        f"""{EMOJI_DEVOTEE} **Adoracion** {EMOJI_WORSHIP}
 
-{worshipper.display_name} se arrodilla ante {target.display_name}{collar_msg}
+{DIVIDER}
 
-💬 "{message}"
+**{worshipper_name}** se arrodilla ante **{target_name}**{collar_msg}
 
-Gloria a {target.display_name}! 👑"""
+{DIVIDER_LIGHT}
+
+💬 _"{message}"_
+
+{DIVIDER_LIGHT}
+
+{EMOJI_CROWN} Gloria a **{target_name}**!"""
     )
 
 
@@ -191,24 +244,40 @@ async def altar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         top_receivers = await altar_repo.get_top_receivers(limit=10)
 
         if not top_receivers:
-            await update.message.reply_text("💎 Aún no se han pagado tributos.")
+            await update.message.reply_text(
+                f"""{EMOJI_ALTAR} **Altar de Tributos**
+
+{DIVIDER_LIGHT}
+
+{EMOJI_INFO} Aun no se han pagado tributos.
+
+Se el primero en rendir tributo con /tributo"""
+            )
             return
 
         # Format leaderboard
         lines = []
-        medals = ["👑", "💎", "✨"]
+        medals = [f"{EMOJI_CROWN}", f"{EMOJI_TRIBUTE}", f"{EMOJI_WORSHIP}"]
         for i, (user, total) in enumerate(top_receivers, 1):
-            medal = medals[i - 1] if i <= 3 else f"{i}."
-            lines.append(f"{medal} {user.display_name}: {total} {settings.currency_name}")
+            medal = medals[i - 1] if i <= 3 else f"`{i}.`"
+            lines.append(f"{medal} **{user.display_name}**: {format_currency(total)}")
 
         leaderboard = "\n".join(lines)
 
     await update.message.reply_text(
-        f"""💎 **Altar de Tributos**
+        f"""{EMOJI_ALTAR} **Altar de Tributos** {EMOJI_TRIBUTE}
 
-Los más adorados:
+{DIVIDER}
 
-{leaderboard}"""
+**Los mas adorados:**
+
+{DIVIDER_LIGHT}
+
+{leaderboard}
+
+{DIVIDER_LIGHT}
+
+{EMOJI_DEVOTEE} Rinde tributo con /tributo @usuario cantidad"""
     )
 
 
@@ -227,7 +296,7 @@ async def mi_altar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         # Get user
         user = await user_repo.get_by_telegram_id(update.effective_user.id)
         if not user:
-            await update.message.reply_text("❌ Debes registrarte primero con /start")
+            await update.message.reply_text(f"{EMOJI_ERROR} Debes registrarte primero con /start")
             return
 
         # Get altar stats
@@ -235,12 +304,32 @@ async def mi_altar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         given = await altar_repo.get_total_given(user.id)
         devotees = await altar_repo.get_devotee_count(user.id)
 
-    await update.message.reply_text(
-        f"""💎 **Tu Altar**
+        user_name = user.display_name
 
-👑 Tributos recibidos: {received} {settings.currency_name}
-🙇 Devotos únicos: {devotees}
-💰 Tributos pagados: {given} {settings.currency_name}"""
+    # Determine status based on stats
+    if received > given:
+        status = f"{EMOJI_CROWN} **Status:** Adorado/a"
+    elif given > received:
+        status = f"{EMOJI_DEVOTEE} **Status:** Devoto/a"
+    else:
+        status = f"{EMOJI_WORSHIP} **Status:** Neutral"
+
+    await update.message.reply_text(
+        f"""{EMOJI_ALTAR} **Altar de {user_name}** {EMOJI_TRIBUTE}
+
+{DIVIDER}
+
+{status}
+
+{DIVIDER_LIGHT}
+
+{EMOJI_CROWN} **Tributos recibidos:** {format_currency(received)}
+{EMOJI_DEVOTEE} **Devotos unicos:** {devotees}
+{EMOJI_BALANCE} **Tributos pagados:** {format_currency(given)}
+
+{DIVIDER_LIGHT}
+
+{EMOJI_INFO} Ver tus devotos: /devotos"""
     )
 
 
@@ -259,27 +348,47 @@ async def devotos_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         # Get user
         user = await user_repo.get_by_telegram_id(update.effective_user.id)
         if not user:
-            await update.message.reply_text("❌ Debes registrarte primero con /start")
+            await update.message.reply_text(f"{EMOJI_ERROR} Debes registrarte primero con /start")
             return
+
+        user_name = user.display_name
 
         # Get devotees
         devotees = await altar_repo.get_devotees(user.id, limit=10)
 
         if not devotees:
-            await update.message.reply_text("💎 Aún no tienes devotos.")
+            await update.message.reply_text(
+                f"""{EMOJI_DEVOTEE} **Tus Devotos**
+
+{DIVIDER_LIGHT}
+
+{EMOJI_INFO} Aun no tienes devotos.
+
+Comparte tu perfil para que otros te rindan tributo!"""
+            )
             return
 
         # Format list
         lines = []
+        medals = [f"{EMOJI_CROWN}", f"{EMOJI_TRIBUTE}", f"{EMOJI_WORSHIP}"]
         for i, (devotee, total) in enumerate(devotees, 1):
-            lines.append(f"{i}. {devotee.display_name}: {total} {settings.currency_name}")
+            medal = medals[i - 1] if i <= 3 else f"`{i}.`"
+            lines.append(f"{medal} **{devotee.display_name}**: {format_currency(total)}")
 
         devotees_list = "\n".join(lines)
 
     await update.message.reply_text(
-        f"""🙇 **Tus Devotos**
+        f"""{EMOJI_DEVOTEE} **Devotos de {user_name}** {EMOJI_CROWN}
+
+{DIVIDER}
+
+**Los que mas te adoran:**
+
+{DIVIDER_LIGHT}
 
 {devotees_list}
 
-Estos son los que te han pagado más tributos."""
+{DIVIDER_LIGHT}
+
+{EMOJI_TRIBUTE} Estos son los que te han pagado mas tributos."""
     )

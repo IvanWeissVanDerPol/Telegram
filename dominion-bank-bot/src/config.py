@@ -36,7 +36,7 @@ class Settings(BaseSettings):
 
     # Admin Configuration
     super_admins: str = Field(default="", alias="SUPER_ADMINS")
-    default_balance: int = Field(default=0, alias="DEFAULT_BALANCE")
+    default_balance: int = Field(default=100, alias="DEFAULT_BALANCE")
     max_transfer_amount: int = Field(default=1000000, alias="MAX_TRANSFER_AMOUNT")
     min_transfer_amount: int = Field(default=1, alias="MIN_TRANSFER_AMOUNT")
 
@@ -44,6 +44,23 @@ class Settings(BaseSettings):
     transfer_cooldown: int = Field(default=5, alias="TRANSFER_COOLDOWN")
     rate_limit_commands: int = Field(default=30, alias="RATE_LIMIT_COMMANDS")
     ranking_cache_ttl: int = Field(default=60, alias="RANKING_CACHE_TTL")
+
+    # Display & Pagination
+    ranking_limit: int = Field(default=10, alias="RANKING_LIMIT")
+    history_limit: int = Field(default=10, alias="HISTORY_LIMIT")
+
+    # BDSM Feature Settings
+    collar_request_expiry_minutes: int = Field(default=5, alias="COLLAR_REQUEST_EXPIRY_MINUTES")
+    contract_request_expiry_minutes: int = Field(default=60, alias="CONTRACT_REQUEST_EXPIRY_MINUTES")
+    default_dungeon_hours: int = Field(default=24, alias="DEFAULT_DUNGEON_HOURS")
+    max_dungeon_hours: int = Field(default=168, alias="MAX_DUNGEON_HOURS")
+    default_auction_hours: int = Field(default=24, alias="DEFAULT_AUCTION_HOURS")
+
+    # Costs (in currency units)
+    collar_cost: int = Field(default=300, alias="COLLAR_COST")
+    whip_cost: int = Field(default=50, alias="WHIP_COST")
+    dungeon_cost: int = Field(default=200, alias="DUNGEON_COST")
+    contract_break_cost: int = Field(default=500, alias="CONTRACT_BREAK_COST")
 
     # Feature Flags
     enable_transfers: bool = Field(default=True, alias="ENABLE_TRANSFERS")

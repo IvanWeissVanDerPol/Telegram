@@ -3,6 +3,8 @@ The Phantom Bot - Core Command Handlers
 /start, /ver, /dar
 """
 import logging
+from datetime import datetime, timezone
+
 from telegram import Update
 from telegram.ext import ContextTypes
 
@@ -122,9 +124,9 @@ async def dar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         # Check cooldown
         cooldown_expires = await cooldown_repo.is_on_cooldown(sender.id, "transfer")
         if cooldown_expires:
-            remaining = (cooldown_expires - __import__("datetime").datetime.utcnow()).seconds
+            remaining = (cooldown_expires - datetime.now(timezone.utc)).total_seconds()
             await update.message.reply_text(
-                ERROR_COOLDOWN.format(seconds=remaining)
+                ERROR_COOLDOWN.format(seconds=int(max(0, remaining)))
             )
             return
 
@@ -165,15 +167,16 @@ async def dar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         await session.refresh(sender)
         await session.refresh(recipient)
 
+        # Extract all values BEFORE leaving session context to avoid detached object issues
         sender_balance = sender.balance
+        sender_display = sender.display_name
         recipient_balance = recipient.balance
         recipient_display = recipient.display_name
+        recipient_telegram_id = recipient.telegram_id
 
-        logger.info(
-            f"Transfer: {sender.display_name} -> {recipient.display_name}: {amount}"
-        )
+        logger.info(f"Transfer: {sender_display} -> {recipient_display}: {amount}")
 
-    # Send confirmation to sender
+    # Send confirmation to sender (using extracted values, not detached objects)
     await update.message.reply_text(
         transfer_success_sender(amount, recipient_display, sender_balance)
     )
@@ -181,39 +184,112 @@ async def dar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     # Try to notify recipient (may fail if bot can't message them)
     try:
         await context.bot.send_message(
-            chat_id=recipient.telegram_id,
-            text=transfer_success_recipient(
-                amount,
-                sender.display_name if sender else "Unknown",
-                recipient_balance,
-            ),
+            chat_id=recipient_telegram_id,
+            text=transfer_success_recipient(amount, sender_display, recipient_balance),
         )
     except Exception as e:
         logger.warning(f"Could not notify recipient: {e}")
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle /help command - show available commands."""
-    if not update.message:
+    """Handle /help command - show available commands based on user role."""
+    if not update.message or not update.effective_user:
         return
 
-    help_text = f"""🎭 {settings.bot_name} - Comandos
+    # Check if user is admin
+    is_admin = False
+    async with get_session() as session:
+        user_repo = UserRepository(session)
+        user = await user_repo.get_by_telegram_id(update.effective_user.id)
+        if user:
+            is_admin = user.is_admin
 
-💰 **Básicos:**
-/start - Registrarse
-/ver - Ver tu saldo
+    # Build help text based on enabled features and user role
+    help_sections = []
+
+    # Header
+    if is_admin:
+        help_sections.append(f"🎭 {settings.bot_name} - Comandos (Admin)\n")
+    else:
+        help_sections.append(f"🎭 {settings.bot_name} - Comandos\n")
+
+    # Basic commands
+    help_sections.append(f"""💰 BÁSICOS:
+/start - Registrarse en el bot
+/ver - Ver tu saldo actual
 /dar @user cantidad - Enviar {settings.currency_name}
-
-📊 **Información:**
 /ranking - Top 10 usuarios
 /historial - Tus últimas transacciones
+/stats - Estadísticas generales""")
 
-👑 **Admin:**
+    # Profile commands
+    help_sections.append("""👤 PERFIL:
+/perfil - Ver tu perfil (o /perfil @user)
+/editarperfil - Modificar tu perfil
+/configuracion - Ajustes de privacidad""")
+
+    # BDSM commands (only if enabled)
+    if settings.enable_bdsm_commands:
+        help_sections.append("""🔗 COLLARES:
+/collar @user - Poner collar (300 💎)
+/liberar @user - Liberar sumiso
+/exhibir - Ver tus collares
+/amo - Ver tu Amo/Ama
+/aceptar_collar - Aceptar collar pendiente
+/rechazar_collar - Rechazar collar
+/suplicar_libertad - Pedir libertad""")
+
+        help_sections.append("""⚡ CASTIGOS:
+/azotar @user [razón] - Azotar (50 💎)
+/castigar @user tipo razón - Castigar
+/mis_castigos - Ver castigos recibidos
+/castigos_dados - Ver castigos dados""")
+
+        help_sections.append("""🏰 CALABOZO:
+/calabozo @user [horas] - Encerrar (200 💎)
+/liberar_calabozo @user - Liberar preso
+/mi_calabozo - Ver tu estado
+/presos - Ver presos actuales
+/suplicar_libertad_calabozo - Pedir salir""")
+
+        help_sections.append("""🔨 SUBASTAS:
+/subasta @user precio_inicial - Subastar
+/pujar subasta_id cantidad - Hacer puja
+/subastas - Ver subastas activas
+/ver_subasta id - Detalles de subasta
+/mis_subastas - Tus subastas
+/cancelar_subasta id - Cancelar""")
+
+        help_sections.append("""📜 CONTRATOS:
+/contrato @user términos - Proponer
+/firmar_contrato id - Firmar contrato
+/rechazar_contrato id - Rechazar
+/romper_contrato id - Romper (500 💎)
+/mis_contratos - Ver tus contratos
+/ver_contrato id - Detalles""")
+
+        help_sections.append("""🛐 TRIBUTOS:
+/tributo @user cantidad - Dar tributo
+/adorar @user - Adorar (gratis)
+/altar @user - Ver altar de alguien
+/mi_altar - Ver tu altar
+/devotos - Ver tus devotos""")
+
+    # Admin commands - only show to admins
+    if is_admin:
+        help_sections.append(f"""👑 ADMIN:
 /dar_admin @user cantidad - Dar {settings.currency_name}
 /quitar @user cantidad - Quitar {settings.currency_name}
-/consultar @user - Ver saldo de otro usuario
+/consultar @user - Ver saldo de usuario
+/setadmin @user - Hacer admin
+/removeadmin @user - Quitar admin
+/syncadmins - Sincronizar admins del grupo
+/importar - Importar datos (Excel)
+/exportar - Exportar datos (Excel)
 
-ℹ️ **Ayuda:**
-/help - Este mensaje"""
+🧪 TESTING:
+/runtest - Ejecutar tests automáticos
+/testdb - Test rápido de sistema""")
 
+    help_text = "\n\n".join(help_sections)
     await update.message.reply_text(help_text)

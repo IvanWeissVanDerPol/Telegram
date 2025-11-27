@@ -15,9 +15,26 @@ from src.database.repositories import (
     TransactionRepository,
     UserRepository,
 )
-from src.utils.helpers import parse_amount
+from src.utils.helpers import extract_username, parse_amount
+from src.utils.messages import (
+    DIVIDER,
+    DIVIDER_LIGHT,
+    EMOJI_BALANCE,
+    EMOJI_ERROR,
+    EMOJI_INFO,
+    EMOJI_SUCCESS,
+    format_currency,
+)
 
 logger = logging.getLogger(__name__)
+
+# Custom emojis for auction system
+EMOJI_AUCTION = "🔨"
+EMOJI_BID = "💰"
+EMOJI_TIMER = "⏱️"
+EMOJI_SELLER = "👤"
+EMOJI_TARGET = "🎯"
+EMOJI_CROWN = "👑"
 
 AUCTION_FEE = 50  # Fee to start an auction
 DEFAULT_AUCTION_HOURS = 24  # Default auction duration
@@ -35,24 +52,41 @@ async def subasta_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     args = context.args if context.args else []
     if len(args) < 2:
         await update.message.reply_text(
-            "📝 Uso: /subasta [precio_inicial] [descripción]\n"
-            f"💰 Comisión: {AUCTION_FEE} {settings.currency_name}\n"
-            f"⏱️ Duración: {DEFAULT_AUCTION_HOURS} horas\n\n"
-            "Ejemplo: /subasta 100 1 hora de servicio exclusivo"
+            f"""{EMOJI_AUCTION} **Crear Subasta**
+
+{DIVIDER_LIGHT}
+
+{EMOJI_INFO} **Uso:** /subasta @usuario precio [descripcion]
+
+{EMOJI_BID} **Precio minimo:** {format_currency(MIN_BID)}
+{EMOJI_BID} **Comision:** {format_currency(AUCTION_FEE)}
+{EMOJI_TIMER} **Duracion:** {DEFAULT_AUCTION_HOURS} horas
+
+{DIVIDER_LIGHT}
+
+**Ejemplo:** /subasta @sumiso 100 Servicio por 1 hora"""
         )
         return
 
-    starting_price = parse_amount(args[0])
-    description = " ".join(args[1:])
+    # Parse arguments: @username price [description]
+    target_username = extract_username(args[0])
+    starting_price = parse_amount(args[1]) if len(args) > 1 else None
+    description = " ".join(args[2:]) if len(args) > 2 else None
+
+    if not target_username:
+        await update.message.reply_text(
+            f"{EMOJI_ERROR} Debes especificar un usuario (@usuario)."
+        )
+        return
 
     if starting_price is None or starting_price < MIN_BID:
         await update.message.reply_text(
-            f"❌ El precio inicial mínimo es {MIN_BID} {settings.currency_name}."
-        )
-        return
+            f"""{EMOJI_ERROR} **Precio Invalido**
 
-    if len(description) < 5:
-        await update.message.reply_text("❌ La descripción es muy corta.")
+{DIVIDER_LIGHT}
+
+{EMOJI_BID} El precio minimo es {format_currency(MIN_BID)}"""
+        )
         return
 
     async with get_session() as session:
@@ -63,14 +97,29 @@ async def subasta_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         # Get seller
         seller = await user_repo.get_by_telegram_id(update.effective_user.id)
         if not seller:
-            await update.message.reply_text("❌ Debes registrarte primero con /start")
+            await update.message.reply_text(f"{EMOJI_ERROR} Debes registrarte primero con /start")
+            return
+
+        # Get target user
+        target = await user_repo.get_by_username(target_username)
+        if not target:
+            await update.message.reply_text(f"{EMOJI_ERROR} Usuario @{target_username} no encontrado.")
+            return
+
+        # Can't auction yourself
+        if seller.id == target.id:
+            await update.message.reply_text(f"{EMOJI_ERROR} No puedes subastarte a ti mismo.")
             return
 
         # Check balance for fee
         if seller.balance < AUCTION_FEE:
             await update.message.reply_text(
-                f"❌ Necesitas {AUCTION_FEE} {settings.currency_name} para iniciar una subasta.\n"
-                f"Tu saldo: {seller.balance} {settings.currency_name}"
+                f"""{EMOJI_ERROR} **Saldo Insuficiente**
+
+{DIVIDER_LIGHT}
+
+{EMOJI_BALANCE} Tu saldo: {format_currency(seller.balance)}
+{EMOJI_BID} Comision: {format_currency(AUCTION_FEE)}"""
             )
             return
 
@@ -78,7 +127,9 @@ async def subasta_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         existing = await auction_repo.get_active_by_seller(seller.id)
         if existing:
             await update.message.reply_text(
-                "❌ Ya tienes una subasta activa. Cancélala primero con /cancelar_subasta"
+                f"""{EMOJI_ERROR} Ya tienes una subasta activa.
+
+Cancelala primero con /cancelar_subasta"""
             )
             return
 
@@ -91,30 +142,44 @@ async def subasta_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             recipient_id=None,
             amount=AUCTION_FEE,
             transaction_type=TransactionType.FEE,
-            description="Comisión de subasta",
+            description="Comision de subasta",
         )
+
+        # Capture names before leaving session
+        seller_name = seller.display_name
+        target_name = target.display_name
 
         # Create auction
         auction = await auction_repo.create(
             seller_id=seller.id,
-            description=description,
             starting_price=starting_price,
             hours=DEFAULT_AUCTION_HOURS,
+            target_id=target.id,
+            description=description,
         )
 
-        logger.info(f"Auction created: {seller.display_name} - {description}")
+        logger.info(f"Auction created: {seller_name} auctioning {target_name} for {starting_price}")
+
+    # Build description line
+    desc_line = f"\n\n📝 _{description}_" if description else ""
 
     await update.message.reply_text(
-        f"""🔨 **Nueva Subasta**
+        f"""{EMOJI_AUCTION} **Nueva Subasta** {EMOJI_CROWN}
 
-🏷️ ID: #{auction.id}
-👤 Vendedor: {seller.display_name}
-📝 {description}
+{DIVIDER}
 
-💰 Precio inicial: {starting_price} {settings.currency_name}
-⏱️ Termina en: {DEFAULT_AUCTION_HOURS} horas
+{EMOJI_SELLER} **Vendedor:** {seller_name}
+{EMOJI_TARGET} **Subastado:** {target_name}{desc_line}
 
-Para pujar: /pujar {auction.id} [cantidad]"""
+{DIVIDER_LIGHT}
+
+🏷️ **ID:** #{auction.id}
+{EMOJI_BID} **Precio inicial:** {format_currency(starting_price)}
+{EMOJI_TIMER} **Termina en:** {DEFAULT_AUCTION_HOURS} horas
+
+{DIVIDER_LIGHT}
+
+{EMOJI_INFO} Para pujar: /pujar {auction.id} [cantidad]"""
     )
 
 
@@ -129,8 +194,13 @@ async def pujar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     args = context.args if context.args else []
     if len(args) < 2:
         await update.message.reply_text(
-            "📝 Uso: /pujar [id_subasta] [cantidad]\n"
-            "Ejemplo: /pujar 1 150"
+            f"""{EMOJI_AUCTION} **Pujar en Subasta**
+
+{DIVIDER_LIGHT}
+
+{EMOJI_INFO} **Uso:** /pujar [id] [cantidad]
+
+**Ejemplo:** /pujar 1 150"""
         )
         return
 
@@ -138,12 +208,12 @@ async def pujar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     bid_amount = parse_amount(args[1])
 
     if auction_id is None:
-        await update.message.reply_text("❌ ID de subasta inválido.")
+        await update.message.reply_text(f"{EMOJI_ERROR} ID de subasta invalido.")
         return
 
     if bid_amount is None or bid_amount < MIN_BID:
         await update.message.reply_text(
-            f"❌ La puja mínima es {MIN_BID} {settings.currency_name}."
+            f"{EMOJI_ERROR} La puja minima es {format_currency(MIN_BID)}."
         )
         return
 
@@ -154,35 +224,39 @@ async def pujar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         # Get bidder
         bidder = await user_repo.get_by_telegram_id(update.effective_user.id)
         if not bidder:
-            await update.message.reply_text("❌ Debes registrarte primero con /start")
+            await update.message.reply_text(f"{EMOJI_ERROR} Debes registrarte primero con /start")
             return
 
         # Get auction
         auction = await auction_repo.get_by_id(auction_id)
         if not auction:
-            await update.message.reply_text("❌ Subasta no encontrada.")
+            await update.message.reply_text(f"{EMOJI_ERROR} Subasta no encontrada.")
             return
 
         # Check if auction is still active
         if auction.status != AuctionStatus.ACTIVE:
-            await update.message.reply_text("❌ Esta subasta ya no está activa.")
+            await update.message.reply_text(f"{EMOJI_ERROR} Esta subasta ya no esta activa.")
             return
 
         # Check if expired
         if auction.ends_at < datetime.utcnow():
-            await update.message.reply_text("❌ Esta subasta ya terminó.")
+            await update.message.reply_text(f"{EMOJI_ERROR} Esta subasta ya termino.")
             return
 
         # Check if bidding on own auction
         if auction.seller_id == bidder.id:
-            await update.message.reply_text("❌ No puedes pujar en tu propia subasta.")
+            await update.message.reply_text(f"{EMOJI_ERROR} No puedes pujar en tu propia subasta.")
             return
 
         # Check balance
         if bidder.balance < bid_amount:
             await update.message.reply_text(
-                f"❌ No tienes suficiente saldo.\n"
-                f"Tu saldo: {bidder.balance} {settings.currency_name}"
+                f"""{EMOJI_ERROR} **Saldo Insuficiente**
+
+{DIVIDER_LIGHT}
+
+{EMOJI_BALANCE} Tu saldo: {format_currency(bidder.balance)}
+{EMOJI_BID} Puja: {format_currency(bid_amount)}"""
             )
             return
 
@@ -190,7 +264,7 @@ async def pujar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         min_required = max(auction.starting_price, (auction.current_bid or 0) + 1)
         if bid_amount < min_required:
             await update.message.reply_text(
-                f"❌ Tu puja debe ser al menos {min_required} {settings.currency_name}."
+                f"{EMOJI_ERROR} Tu puja debe ser al menos {format_currency(min_required)}."
             )
             return
 
@@ -206,17 +280,31 @@ async def pujar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         # Place bid
         await auction_repo.place_bid(auction.id, bidder.id, bid_amount)
 
-        logger.info(f"Bid: {bidder.display_name} bid {bid_amount} on auction #{auction.id}")
+        # Capture info before leaving session
+        bidder_name = bidder.display_name
+        target_name = auction.target.display_name if auction.target else None
+        description = auction.description
+
+        logger.info(f"Bid: {bidder_name} bid {bid_amount} on auction #{auction.id}")
+
+    # Build target line
+    target_line = f"\n{EMOJI_TARGET} **Subastado:** {target_name}" if target_name else ""
+    desc_line = f"\n📝 _{description}_" if description else ""
 
     await update.message.reply_text(
-        f"""🔨 **Puja Realizada**
+        f"""{EMOJI_AUCTION} **Puja Realizada** {EMOJI_SUCCESS}
 
-Subasta #{auction.id}
-📝 {auction.description}
+{DIVIDER}
 
-💰 Tu puja: {bid_amount} {settings.currency_name}
+🏷️ Subasta #{auction_id}{target_line}{desc_line}
 
-¡Eres el pujador más alto!"""
+{DIVIDER_LIGHT}
+
+{EMOJI_BID} **Tu puja:** {format_currency(bid_amount)}
+
+{DIVIDER_LIGHT}
+
+{EMOJI_CROWN} Eres el pujador mas alto!"""
     )
 
 
@@ -235,7 +323,15 @@ async def subastas_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         auctions = await auction_repo.get_all_active()
 
         if not auctions:
-            await update.message.reply_text("🔨 No hay subastas activas.")
+            await update.message.reply_text(
+                f"""{EMOJI_AUCTION} **Subastas Activas**
+
+{DIVIDER_LIGHT}
+
+{EMOJI_INFO} No hay subastas activas.
+
+Crea una con /subasta @usuario precio"""
+            )
             return
 
         # Format list
@@ -253,20 +349,25 @@ async def subastas_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
                 time_str = "Terminando..."
 
             current = auction.current_bid or auction.starting_price
+            target_info = f" {EMOJI_TARGET} {auction.target.display_name}" if auction.target else ""
             lines.append(
-                f"🔨 **#{auction.id}** - {auction.seller.display_name}\n"
-                f"   📝 {auction.description[:50]}...\n"
-                f"   💰 Actual: {current} | ⏱️ {time_str}\n"
+                f"{EMOJI_AUCTION} **#{auction.id}**{target_info}\n"
+                f"   {EMOJI_SELLER} {auction.seller.display_name}\n"
+                f"   {EMOJI_BID} {format_currency(current)} | {EMOJI_TIMER} {time_str}"
             )
 
-        auctions_list = "\n".join(lines)
+        auctions_list = "\n\n".join(lines)
 
     await update.message.reply_text(
-        f"""🔨 **Subastas Activas**
+        f"""{EMOJI_AUCTION} **Subastas Activas** {EMOJI_CROWN}
+
+{DIVIDER}
 
 {auctions_list}
 
-Para pujar: /pujar [id] [cantidad]"""
+{DIVIDER_LIGHT}
+
+{EMOJI_INFO} Para pujar: /pujar [id] [cantidad]"""
     )
 
 
@@ -280,12 +381,18 @@ async def ver_subasta_command(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     args = context.args if context.args else []
     if not args:
-        await update.message.reply_text("📝 Uso: /ver_subasta [id]")
+        await update.message.reply_text(
+            f"""{EMOJI_AUCTION} **Ver Subasta**
+
+{DIVIDER_LIGHT}
+
+{EMOJI_INFO} **Uso:** /ver_subasta [id]"""
+        )
         return
 
     auction_id = parse_amount(args[0])
     if auction_id is None:
-        await update.message.reply_text("❌ ID de subasta inválido.")
+        await update.message.reply_text(f"{EMOJI_ERROR} ID de subasta invalido.")
         return
 
     async with get_session() as session:
@@ -294,7 +401,7 @@ async def ver_subasta_command(update: Update, context: ContextTypes.DEFAULT_TYPE
         # Get auction
         auction = await auction_repo.get_by_id(auction_id)
         if not auction:
-            await update.message.reply_text("❌ Subasta no encontrada.")
+            await update.message.reply_text(f"{EMOJI_ERROR} Subasta no encontrada.")
             return
 
         # Format status
@@ -303,29 +410,42 @@ async def ver_subasta_command(update: Update, context: ContextTypes.DEFAULT_TYPE
             AuctionStatus.COMPLETED: "✅ Completada",
             AuctionStatus.CANCELLED: "❌ Cancelada",
         }
-        status = status_emoji.get(auction.status, "❓ Desconocido")
+        status = status_emoji.get(auction.status, "? Desconocido")
 
         # Time info
         if auction.status == AuctionStatus.ACTIVE and auction.ends_at > datetime.utcnow():
             time_left = auction.ends_at - datetime.utcnow()
             hours = int(time_left.total_seconds() / 3600)
             minutes = int((time_left.total_seconds() % 3600) / 60)
-            time_str = f"⏱️ Termina en: {hours}h {minutes}m"
+            time_str = f"{EMOJI_TIMER} Termina en: {hours}h {minutes}m"
         else:
-            time_str = "⏱️ Terminada"
+            time_str = f"{EMOJI_TIMER} Terminada"
 
         current = auction.current_bid or auction.starting_price
         bidder_name = auction.current_bidder.display_name if auction.current_bidder else "Nadie"
+        seller_name = auction.seller.display_name
+        target_name = auction.target.display_name if auction.target else None
+        description = auction.description
+        starting_price = auction.starting_price
+
+    # Build target line
+    target_line = f"\n{EMOJI_TARGET} **Subastado:** {target_name}" if target_name else ""
+    desc_line = f"\n\n📝 _{description}_" if description else ""
 
     await update.message.reply_text(
-        f"""🔨 **Subasta #{auction.id}**
+        f"""{EMOJI_AUCTION} **Subasta #{auction_id}** {EMOJI_CROWN}
 
-👤 Vendedor: {auction.seller.display_name}
-📝 {auction.description}
+{DIVIDER}
 
-💰 Precio inicial: {auction.starting_price} {settings.currency_name}
-💰 Puja actual: {current} {settings.currency_name}
-👤 Pujador: {bidder_name}
+{EMOJI_SELLER} **Vendedor:** {seller_name}{target_line}{desc_line}
+
+{DIVIDER_LIGHT}
+
+{EMOJI_BID} **Precio inicial:** {format_currency(starting_price)}
+{EMOJI_BID} **Puja actual:** {format_currency(current)}
+{EMOJI_SELLER} **Pujador:** {bidder_name}
+
+{DIVIDER_LIGHT}
 
 {status}
 {time_str}"""
@@ -347,14 +467,19 @@ async def cancelar_subasta_command(update: Update, context: ContextTypes.DEFAULT
         # Get user
         user = await user_repo.get_by_telegram_id(update.effective_user.id)
         if not user:
-            await update.message.reply_text("❌ Debes registrarte primero con /start")
+            await update.message.reply_text(f"{EMOJI_ERROR} Debes registrarte primero con /start")
             return
 
         # Get user's active auction
         auction = await auction_repo.get_active_by_seller(user.id)
         if not auction:
-            await update.message.reply_text("❌ No tienes ninguna subasta activa.")
+            await update.message.reply_text(f"{EMOJI_ERROR} No tienes ninguna subasta activa.")
             return
+
+        # Capture info before changes
+        auction_id = auction.id
+        target_name = auction.target.display_name if auction.target else None
+        user_name = user.display_name
 
         # Refund current bidder if any
         if auction.current_bidder_id and auction.current_bid:
@@ -363,14 +488,21 @@ async def cancelar_subasta_command(update: Update, context: ContextTypes.DEFAULT
         # Cancel auction
         await auction_repo.cancel(auction.id)
 
-        logger.info(f"Auction cancelled: #{auction.id} by {user.display_name}")
+        logger.info(f"Auction cancelled: #{auction_id} by {user_name}")
+
+    # Build target line
+    target_line = f"\n{EMOJI_TARGET} **Subastado:** {target_name}" if target_name else ""
 
     await update.message.reply_text(
-        f"""🔨 **Subasta Cancelada**
+        f"""{EMOJI_AUCTION} **Subasta Cancelada**
 
-Tu subasta #{auction.id} ha sido cancelada.
+{DIVIDER}
 
-Nota: La comisión de {AUCTION_FEE} {settings.currency_name} no es reembolsable."""
+🏷️ Subasta #{auction_id} cancelada{target_line}
+
+{DIVIDER_LIGHT}
+
+{EMOJI_INFO} La comision de {format_currency(AUCTION_FEE)} no es reembolsable."""
     )
 
 
@@ -389,14 +521,24 @@ async def mis_subastas_command(update: Update, context: ContextTypes.DEFAULT_TYP
         # Get user
         user = await user_repo.get_by_telegram_id(update.effective_user.id)
         if not user:
-            await update.message.reply_text("❌ Debes registrarte primero con /start")
+            await update.message.reply_text(f"{EMOJI_ERROR} Debes registrarte primero con /start")
             return
+
+        user_name = user.display_name
 
         # Get user's auctions (active and recent)
         auctions = await auction_repo.get_by_seller(user.id, limit=10)
 
         if not auctions:
-            await update.message.reply_text("🔨 No tienes subastas.")
+            await update.message.reply_text(
+                f"""{EMOJI_AUCTION} **Tus Subastas**
+
+{DIVIDER_LIGHT}
+
+{EMOJI_INFO} No tienes subastas.
+
+Crea una con /subasta @usuario precio"""
+            )
             return
 
         # Format list
@@ -407,17 +549,20 @@ async def mis_subastas_command(update: Update, context: ContextTypes.DEFAULT_TYP
                 AuctionStatus.COMPLETED: "✅",
                 AuctionStatus.CANCELLED: "❌",
             }
-            emoji = status_emoji.get(auction.status, "❓")
+            emoji = status_emoji.get(auction.status, "?")
             current = auction.current_bid or auction.starting_price
+            target_info = f" {EMOJI_TARGET} {auction.target.display_name}" if auction.target else ""
             lines.append(
-                f"{emoji} #{auction.id} - {auction.description[:30]}...\n"
-                f"   💰 {current} {settings.currency_name}"
+                f"{emoji} **#{auction.id}**{target_info}\n"
+                f"   {EMOJI_BID} {format_currency(current)}"
             )
 
-        auctions_list = "\n".join(lines)
+        auctions_list = "\n\n".join(lines)
 
     await update.message.reply_text(
-        f"""🔨 **Tus Subastas**
+        f"""{EMOJI_AUCTION} **Subastas de {user_name}**
+
+{DIVIDER}
 
 {auctions_list}"""
     )

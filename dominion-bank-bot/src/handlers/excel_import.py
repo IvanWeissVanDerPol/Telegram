@@ -21,7 +21,7 @@ async def importar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         return
 
     # Check if user is admin
-    if update.effective_user.id not in settings.admin_ids:
+    if update.effective_user.id not in settings.super_admin_ids:
         await update.message.reply_text("❌ Solo los administradores pueden importar datos.")
         return
 
@@ -55,7 +55,7 @@ async def handle_excel_document(update: Update, context: ContextTypes.DEFAULT_TY
         return
 
     # Check if user is admin
-    if update.effective_user.id not in settings.admin_ids:
+    if update.effective_user.id not in settings.super_admin_ids:
         return
 
     document = update.message.document
@@ -190,7 +190,7 @@ async def exportar_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         return
 
     # Check if user is admin
-    if update.effective_user.id not in settings.admin_ids:
+    if update.effective_user.id not in settings.super_admin_ids:
         await update.message.reply_text("❌ Solo los administradores pueden exportar datos.")
         return
 

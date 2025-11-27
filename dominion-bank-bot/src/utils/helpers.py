@@ -2,7 +2,7 @@
 The Phantom Bot - Helper Utilities
 """
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from telegram import Update, User as TelegramUser
@@ -61,7 +61,7 @@ def get_user_info(user: TelegramUser) -> dict:
 
 def format_time_ago(dt: datetime) -> str:
     """Format datetime as relative time string in Spanish."""
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     diff = now - dt
 
     if diff < timedelta(minutes=1):

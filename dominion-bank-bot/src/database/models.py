@@ -474,7 +474,7 @@ class Dungeon(Base):
 
 
 class Auction(Base):
-    """Auction model - users auctioning themselves or services."""
+    """Auction model - users auctioning other users or services."""
     __tablename__ = "auctions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -482,6 +482,12 @@ class Auction(Base):
         Integer,
         ForeignKey("users.id"),
         nullable=False,
+        index=True
+    )
+    target_id: Mapped[Optional[int]] = mapped_column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=True,
         index=True
     )
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
@@ -506,6 +512,7 @@ class Auction(Base):
 
     # Relationships
     seller: Mapped["User"] = relationship("User", foreign_keys=[seller_id])
+    target: Mapped[Optional["User"]] = relationship("User", foreign_keys=[target_id])
     current_bidder: Mapped[Optional["User"]] = relationship("User", foreign_keys=[current_bidder_id])
     bids: Mapped[list["Bid"]] = relationship("Bid", back_populates="auction")
 
